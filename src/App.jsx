@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Upload, X, Plus, Trash2, Edit2, Clock, Star, Sparkles, ChevronRight, Heart, Search, Loader, AlertCircle, CheckCircle } from 'lucide-react';
+import { Camera, Upload, X, Plus, Trash2, Clock, Star, Sparkles, ChevronRight, Heart, Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { detectMaterials, generateCrafts } from './api';
 
 // ============================================================================
@@ -20,7 +20,7 @@ export default function CraftlyAI() {
   const [craftSuggestions, setCraftSuggestions] = useState([]);
   const [selectedCraft, setSelectedCraft] = useState(null);
   const [savedCrafts, setSavedCrafts] = useState([]);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false); // eslint-disable-line no-unused-vars
   const [error, setError] = useState(null);
 
   // Screen navigation
@@ -1413,7 +1413,7 @@ function ReviewScreen({ detectedMaterials, confirmedMaterials, setConfirmedMater
     if (confirmedMaterials.length === 0) {
       setConfirmedMaterials(detectedMaterials);
     }
-  }, [detectedMaterials]);
+  }, [detectedMaterials]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const removeMaterial = (name) => {
     setConfirmedMaterials(confirmedMaterials.filter(m => m.name !== name));
