@@ -1128,8 +1128,8 @@ export default function CraftlyAI() {
           <div className="welcome-bg-blob"></div>
           
           <div className="logo-container">
-            <div className="logo">
-              <Sparkles className="logo-icon" />
+            <div className="logo" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
+              <img src={process.env.PUBLIC_URL + '/logo.png'} alt="Craftly AI" style={{ width: '120px', height: '120px', borderRadius: '32px', objectFit: 'contain', boxShadow: '0 20px 40px rgba(60,207,207,0.3)' }} />
             </div>
             <h1 className="app-name">Craftly AI</h1>
             <p className="app-tagline">Turn Waste into Wonder ✨</p>
