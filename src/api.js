@@ -77,6 +77,16 @@ export async function generateCrafts(materials, preferences) {
   const materialsText = materials.join(', ');
   const toolsText = preferences.tools?.length > 0 ? preferences.tools.join(', ') : 'scissors and glue';
   const timestamp = Date.now();
+  const randomSeed = Math.floor(Math.random() * 10000);
+
+  const craftTypes = [
+    'home decoration', 'functional storage organizer', 'kids toy or game', 
+    'garden or outdoor item', 'wearable accessory', 'wall art', 
+    'gift item', 'desk organizer', 'plant holder', 'lamp or lighting'
+  ];
+  
+  // Pick 4 random different craft types to force variety
+  const shuffled = craftTypes.sort(() => Math.random() - 0.5).slice(0, 4);
 
   const res = await fetch(BASE_URL, {
     method: 'POST',
@@ -86,19 +96,37 @@ export async function generateCrafts(materials, preferences) {
       messages: [
         {
           role: 'system',
-          content: 'You are a DIY craft expert. Always respond with valid JSON only. No markdown, no explanation, just the JSON array.'
+          content: 'You are a highly creative DIY craft expert. You always suggest fresh, unique, surprising craft ideas. Never repeat generic ideas. Always respond with valid JSON only.'
         },
         {
           role: 'user',
-          content: `Generate 4 unique DIY craft ideas using these materials: ${materialsText}
-Skill: ${preferences.skillLevel}, Time: ${preferences.timeAvailable} mins, Purpose: ${preferences.purpose}, Tools: ${toolsText}
+          content: `Generate exactly 4 COMPLETELY DIFFERENT DIY craft ideas. Each must be a different TYPE of craft.
 
-Respond with ONLY this JSON array (no markdown, no code blocks):
-[{"id":"craft-${timestamp}-1","name":"Craft Name","emoji":"🎨","difficulty":"Easy ⭐","time":"20 mins","materials":["material1"],"steps":[{"title":"Step","description":"Do this"}],"tips":["tip1"]}]`
+MATERIALS AVAILABLE: ${materialsText}
+SKILL LEVEL: ${preferences.skillLevel}
+TIME: ${preferences.timeAvailable} minutes  
+PURPOSE: ${preferences.purpose}
+TOOLS: ${toolsText}
+RANDOM SEED: ${randomSeed}
+
+REQUIRED CRAFT TYPES (one idea per type):
+1. ${shuffled[0]}
+2. ${shuffled[1]}
+3. ${shuffled[2]}
+4. ${shuffled[3]}
+
+RULES:
+- Each craft must be completely different from the others
+- Be creative and specific - no generic "pen holder" or "photo frame" ideas
+- Use the materials creatively and unexpectedly
+- Match the skill level and time limit
+
+Respond with ONLY this JSON array (no markdown, no code blocks, no explanation):
+[{"id":"craft-${timestamp}-1","name":"Specific Creative Name","emoji":"🎨","difficulty":"Easy ⭐","time":"20 mins","materials":["material1","material2"],"steps":[{"title":"Step Title","description":"Exactly what to do"}],"tips":["specific helpful tip"]}]`
         }
       ],
-      max_tokens: 2000,
-      temperature: 0.7
+      max_tokens: 2500,
+      temperature: 1.0
     })
   });
 
