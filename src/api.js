@@ -12,8 +12,6 @@ const headers = {
 const MODEL = 'meta-llama/llama-3.1-8b-instruct:free';
 
 export async function detectMaterials(imageBase64, mediaType) {
-  // Instead of vision model, use text model with a description approach
-  // This avoids vision model JSON parsing issues
   try {
     const res = await fetch(BASE_URL, {
       method: 'POST',
@@ -29,15 +27,27 @@ export async function detectMaterials(imageBase64, mediaType) {
             },
             {
               type: 'text',
-              text: `List all household items and recyclable materials visible in this image that could be used for DIY crafts.
+              text: `You are a material detection expert. Look VERY carefully at every part of this image and list ALL objects, items, and materials you can see that could be used for DIY crafts or recycling projects.
 
-IMPORTANT: Respond with ONLY a JSON array. No explanation, no markdown, no code blocks.
-Format: [{"name":"item name","emoji":"emoji"}]
-Example: [{"name":"cardboard box","emoji":"📦"},{"name":"plastic bottle","emoji":"🍾"}]`
+Be extremely thorough - check every corner, background, and foreground of the image.
+
+Look specifically for:
+- Containers: bottles, jars, cans, boxes, cartons, cups, bowls
+- Paper items: newspapers, magazines, cardboard, paper bags, envelopes
+- Fabric: cloth, clothing, ribbons, strings, yarn, thread
+- Small items: buttons, coins, caps, lids, clips, rubber bands
+- Natural items: leaves, sticks, stones, shells
+- Tools/supplies: scissors, tape, glue, paint, brushes, markers, pens, pencils
+- Electronics parts: wires, batteries, old devices
+- Kitchen items: egg cartons, toilet rolls, paper towels, foil
+- Any other reusable or recyclable material
+
+IMPORTANT: Respond with ONLY a JSON array. No explanation, no markdown, no code blocks. Just the array.
+Format exactly like this: [{"name":"item name","emoji":"emoji"},{"name":"item2","emoji":"emoji2"}]`
             }
           ]
         }],
-        max_tokens: 500,
+        max_tokens: 800,
         temperature: 0.1
       })
     });
@@ -45,11 +55,9 @@ Example: [{"name":"cardboard box","emoji":"📦"},{"name":"plastic bottle","emoj
     const data = await res.json();
     const text = data.choices?.[0]?.message?.content || '';
     
-    // Try multiple JSON extraction strategies
     let materials = tryParseJSON(text);
     
     if (!materials || materials.length === 0) {
-      // Fallback: extract from text description
       materials = extractMaterialsFromText(text);
     }
 

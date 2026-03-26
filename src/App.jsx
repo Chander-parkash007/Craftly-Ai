@@ -1307,15 +1307,26 @@ function UploadScreen({ images, setImages, goToScreen, setDetectedMaterials, set
     setError(null);
 
     try {
-      const img = images[0];
-      const materials = await detectMaterials(img.url.split(',')[1], img.file.type);
+      // Analyze all uploaded images and combine results
+      const allMaterials = [];
+      const seen = new Set();
 
-      if (materials.length === 0) {
+      for (const img of images) {
+        const materials = await detectMaterials(img.url.split(',')[1], img.file.type);
+        for (const mat of materials) {
+          if (!seen.has(mat.name.toLowerCase())) {
+            seen.add(mat.name.toLowerCase());
+            allMaterials.push(mat);
+          }
+        }
+      }
+
+      if (allMaterials.length === 0) {
         setError('No craft materials detected. Try a clearer image.');
         return;
       }
 
-      setDetectedMaterials(materials);
+      setDetectedMaterials(allMaterials);
       goToScreen('review');
     } catch (err) {
       console.error('Detection error:', err);
