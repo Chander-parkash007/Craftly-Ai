@@ -1,4 +1,3 @@
-const OPENROUTER_KEY = process.env.REACT_APP_OPENROUTER_API_KEY;
 const GROQ_KEY = process.env.REACT_APP_GROQ_API_KEY;
 
 // Groq for vision (image detection) - fast and free
