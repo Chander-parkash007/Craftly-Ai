@@ -69,12 +69,72 @@ export default function CraftlyAI() {
         }
 
         .app-container {
-          max-width: 430px;
+          max-width: 100%;
           margin: 0 auto;
           background: white;
           min-height: 100vh;
           position: relative;
-          box-shadow: 0 0 60px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (min-width: 768px) {
+          .app-container {
+            max-width: 900px;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.08);
+          }
+
+          .welcome-screen {
+            padding: 80px 60px;
+          }
+
+          .feature-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+
+          .app-name {
+            font-size: 64px;
+          }
+
+          .upload-screen {
+            padding: 40px 60px;
+          }
+
+          .image-preview-grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+
+          .option-grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+
+          .tools-grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+
+          .craft-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .detail-header {
+            height: 320px;
+            font-size: 128px;
+          }
+
+          .detail-content {
+            padding: 40px 60px;
+          }
+
+          .bottom-nav {
+            max-width: 900px;
+          }
+
+          .results-header {
+            padding: 48px 60px;
+          }
+
+          .processing-screen {
+            padding: 80px 60px;
+          }
         }
 
         .welcome-screen {
@@ -1269,6 +1329,7 @@ export default function CraftlyAI() {
 
 function UploadScreen({ images, setImages, goToScreen, setDetectedMaterials, setError, error }) {
   const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
@@ -1357,7 +1418,7 @@ function UploadScreen({ images, setImages, goToScreen, setDetectedMaterials, set
           <div className="upload-title">Add Your Materials</div>
           <div className="upload-subtitle">Take a photo or choose from gallery</div>
           <div className="upload-buttons">
-            <button className="upload-button" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}>
+            <button className="upload-button" onClick={(e) => { e.stopPropagation(); cameraInputRef.current?.click(); }}>
               <Camera size={18} />
               Camera
             </button>
@@ -1371,6 +1432,14 @@ function UploadScreen({ images, setImages, goToScreen, setDetectedMaterials, set
             type="file"
             accept="image/*"
             multiple
+            onChange={handleFileChange}
+            className="hidden-input"
+          />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
             onChange={handleFileChange}
             className="hidden-input"
           />

@@ -1,4 +1,5 @@
 const GROQ_KEY = process.env.REACT_APP_GROQ_API_KEY;
+console.log('Groq key loaded:', GROQ_KEY ? 'YES (' + GROQ_KEY.substring(0, 8) + '...)' : 'NO - KEY MISSING');
 
 // Groq for vision (image detection) - fast and free
 async function detectWithGroq(imageBase64, mediaType) {
