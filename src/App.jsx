@@ -1413,11 +1413,11 @@ function UploadScreen({ images, setImages, goToScreen, setDetectedMaterials, set
       )}
 
       {images.length === 0 ? (
-        <div className="upload-area" onClick={() => fileInputRef.current?.click()}>
+        <div className="upload-area">
           <Upload className="upload-icon" />
           <div className="upload-title">Add Your Materials</div>
           <div className="upload-subtitle">Take a photo or choose from gallery</div>
-          <div className="upload-buttons" onClick={(e) => e.stopPropagation()}>
+          <div className="upload-buttons">
             <button className="upload-button" onClick={() => cameraInputRef.current?.click()}>
               <Camera size={18} />
               Camera
