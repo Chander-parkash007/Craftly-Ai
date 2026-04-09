@@ -813,6 +813,12 @@ export default function CraftlyAI() {
           justify-content: center;
           font-size: 64px;
           position: relative;
+          border-bottom: 2px solid #f0f0f0;
+        }
+
+        .craft-image span {
+          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+          animation: float 3s ease-in-out infinite;
         }
 
         .craft-badge {
@@ -1764,7 +1770,7 @@ function ResultsScreen({ craftSuggestions, setSelectedCraft, goToScreen, toggleS
         {craftSuggestions.map((craft) => (
           <div key={craft.id} className="craft-card" onClick={() => handleCraftClick(craft)}>
             <div className="craft-image">
-              <span style={{ fontSize: '96px' }}>{craft.emoji}</span>
+              <span style={{ fontSize: '120px', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' }}>{craft.emoji}</span>
               <div className="craft-badge">
                 <Star size={14} />
                 {craft.difficulty}
