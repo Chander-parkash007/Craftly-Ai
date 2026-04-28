@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Upload, X, Plus, Trash2, Clock, Star, Sparkles, ChevronRight, Heart, Search, AlertCircle, CheckCircle } from 'lucide-react';
+import { Camera, Upload, X, Plus, Trash2, Clock, Star, Sparkles, ChevronRight, Heart, Search, AlertCircle, CheckCircle, LogOut, Eye, EyeOff, Share2 } from 'lucide-react';
 import { detectMaterials, generateCrafts } from './api';
 
 // ============================================================================
@@ -8,6 +8,7 @@ import { detectMaterials, generateCrafts } from './api';
 
 export default function CraftlyAI() {
   const [screen, setScreen] = useState('welcome');
+  const [currentUser, setCurrentUser] = useState(null);
   const [images, setImages] = useState([]);
   const [detectedMaterials, setDetectedMaterials] = useState([]);
   const [confirmedMaterials, setConfirmedMaterials] = useState([]);
@@ -40,14 +41,76 @@ export default function CraftlyAI() {
     goToScreen('welcome');
   };
 
-  // Toggle saved craft
+  // Toggle saved craft - always reads fresh from localStorage
   const toggleSaveCraft = (craft) => {
-    const isSaved = savedCrafts.some(c => c.id === craft.id);
-    if (isSaved) {
-      setSavedCrafts(savedCrafts.filter(c => c.id !== craft.id));
-    } else {
-      setSavedCrafts([...savedCrafts, craft]);
-    }
+    if (!currentUser) { goToScreen('login'); return; }
+    const key = 'craftly_saves_' + currentUser.email;
+    const stored = localStorage.getItem(key);
+    const current = stored ? JSON.parse(stored) : [];
+    const isSaved = current.some(c => c.id === craft.id);
+    const updated = isSaved
+      ? current.filter(c => c.id !== craft.id)
+      : [...current, { ...craft, savedAt: new Date().toISOString() }];
+    setSavedCrafts(updated);
+    localStorage.setItem(key, JSON.stringify(updated));
+  };
+
+  // ── SESSION RESTORE ──────────────────────────────────────────────────────
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('craftly_session');
+      if (stored) {
+        const user = JSON.parse(stored);
+        setCurrentUser(user);
+        const data = localStorage.getItem('craftly_saves_' + user.email);
+        setSavedCrafts(data ? JSON.parse(data) : []);
+        setScreen('welcome');
+      }
+    } catch (e) { localStorage.removeItem('craftly_session'); }
+  }, []);
+
+  const handleLogin = (email, password) => {
+    try {
+      const users = JSON.parse(localStorage.getItem('craftly_users') || '[]');
+      const user = users.find(u => u.email === email && u.password === password);
+      if (!user) return { success: false, message: 'Invalid email or password' };
+      const session = { email: user.email, name: user.name };
+      setCurrentUser(session);
+      localStorage.setItem('craftly_session', JSON.stringify(session));
+      const data = localStorage.getItem('craftly_saves_' + email);
+      setSavedCrafts(data ? JSON.parse(data) : []);
+      setScreen('upload');
+      return { success: true };
+    } catch (e) { return { success: false, message: 'Something went wrong' }; }
+  };
+
+  const handleSignup = (name, email, password) => {
+    try {
+      const users = JSON.parse(localStorage.getItem('craftly_users') || '[]');
+      if (users.find(u => u.email === email)) return { success: false, message: 'Email already registered' };
+      users.push({ name, email, password });
+      localStorage.setItem('craftly_users', JSON.stringify(users));
+      const session = { email, name };
+      setCurrentUser(session);
+      localStorage.setItem('craftly_session', JSON.stringify(session));
+      setScreen('upload');
+      return { success: true };
+    } catch (e) { return { success: false, message: 'Something went wrong' }; }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('craftly_session');
+    setCurrentUser(null);
+    setSavedCrafts([]);
+    setImages([]); setDetectedMaterials([]); setConfirmedMaterials([]);
+    setCraftSuggestions([]); setSelectedCraft(null); setError(null);
+    setScreen('welcome');
+  };
+
+  const shareCraft = async (craft) => {
+    const text = craft.name + ' ' + craft.emoji + ' - Made with Craftly AI!';
+    if (navigator.share) { try { await navigator.share({ title: craft.name, text }); } catch (e) {} }
+    else { try { await navigator.clipboard.writeText(text); alert('Copied!'); } catch (e) {} }
   };
 
   return (
@@ -1186,16 +1249,71 @@ export default function CraftlyAI() {
             grid-template-columns: 1fr;
           }
         }
+
+        /* ── AUTH STYLES ─────────────────────────────────── */
+        .auth-screen { min-height:100vh; background:linear-gradient(180deg,#FFE8DC 0%,#FFFFFF 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 24px; position:relative; }
+        .auth-logo { width:80px; height:80px; background:linear-gradient(135deg,#3CCFCF,#FF6F61); border-radius:20px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; box-shadow:0 12px 32px rgba(60,207,207,0.3); }
+        .auth-card { background:white; padding:28px 24px; border-radius:24px; box-shadow:0 8px 40px rgba(0,0,0,0.10); width:100%; max-width:400px; margin-top:16px; }
+        .auth-title { font-family:'Fredoka',sans-serif; font-size:24px; font-weight:700; color:#333; margin-bottom:4px; text-align:center; }
+        .auth-subtitle { font-size:14px; color:#888; text-align:center; margin-bottom:20px; }
+        .auth-field { margin-bottom:14px; }
+        .auth-label { display:block; font-size:13px; font-weight:600; color:#555; margin-bottom:5px; }
+        .auth-input { width:100%; padding:12px 14px; border:2px solid #E8E8E8; border-radius:12px; font-size:15px; outline:none; transition:border-color 0.2s; font-family:'DM Sans',sans-serif; box-sizing:border-box; }
+        .auth-input:focus { border-color:#3CCFCF; background:#F0FCFC; }
+        .auth-input-wrap { position:relative; }
+        .auth-eye { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#999; padding:4px; }
+        .auth-btn { width:100%; padding:14px; background:linear-gradient(135deg,#3CCFCF,#2AB8B8); color:white; border:none; border-radius:12px; font-family:'Fredoka',sans-serif; font-size:17px; font-weight:600; cursor:pointer; margin-top:6px; box-shadow:0 6px 20px rgba(60,207,207,0.35); transition:all 0.2s; }
+        .auth-btn:hover { transform:translateY(-2px); }
+        .auth-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+        .auth-switch { text-align:center; margin-top:18px; font-size:14px; color:#666; }
+        .auth-link { color:#3CCFCF; font-weight:700; cursor:pointer; }
+        .auth-error { background:#FFF0F0; border:1.5px solid #FF6F61; border-radius:10px; padding:10px 14px; font-size:13px; color:#CC3333; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+        .auth-back { position:absolute; top:16px; left:16px; background:white; border:none; width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
       `}</style>
+
+      {screen === 'login' && (
+        <LoginScreen onLogin={handleLogin} onSwitchToSignup={() => setScreen('signup')} onBack={() => setScreen('welcome')} />
+      )}
+
+      {screen === 'signup' && (
+        <SignupScreen onSignup={handleSignup} onSwitchToLogin={() => setScreen('login')} onBack={() => setScreen('welcome')} />
+      )}
 
       {screen === 'welcome' && (
         <div className="welcome-screen fade-in">
           <div className="welcome-bg-blob"></div>
           <div className="welcome-bg-blob"></div>
-          
-          <div className="logo-container">
-            <div className="logo" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
-              <img src={process.env.PUBLIC_URL + '/logo.png'} alt="Craftly AI" style={{ width: '120px', height: '120px', borderRadius: '32px', objectFit: 'contain', boxShadow: '0 20px 40px rgba(60,207,207,0.3)' }} />
+
+          {/* TOP HEADER */}
+          <div style={{position:'absolute',top:0,left:0,right:0,padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',zIndex:10,background:'rgba(255,255,255,0.92)',backdropFilter:'blur(8px)',borderBottom:'1px solid rgba(0,0,0,0.06)'}}>
+            <span style={{fontFamily:"'Fredoka',sans-serif",fontSize:'20px',fontWeight:700,background:'linear-gradient(135deg,#3CCFCF,#FF6F61)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Craftly AI</span>
+            <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+              {currentUser ? (
+                <>
+                  <button onClick={() => goToScreen('saved')} style={{display:'flex',alignItems:'center',gap:'5px',background:'#FFF0F0',border:'none',padding:'7px 13px',borderRadius:'20px',cursor:'pointer',fontSize:'13px',fontWeight:'600',color:'#FF6F61'}}>
+                    <Heart size={14} fill={savedCrafts.length > 0 ? '#FF6F61' : 'none'} color="#FF6F61"/>
+                    Saved{savedCrafts.length > 0 ? ` (${savedCrafts.length})` : ''}
+                  </button>
+                  <div style={{display:'flex',alignItems:'center',gap:'6px',background:'white',padding:'6px 12px',borderRadius:'20px',boxShadow:'0 2px 8px rgba(0,0,0,0.08)',fontSize:'13px',fontWeight:'600',color:'#333'}}>
+                    <div style={{width:'26px',height:'26px',background:'linear-gradient(135deg,#3CCFCF,#2AB8B8)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:'12px',fontWeight:'700'}}>{currentUser.name.charAt(0).toUpperCase()}</div>
+                    <span>{currentUser.name.split(' ')[0]}</span>
+                    <button onClick={handleLogout} style={{background:'none',border:'none',cursor:'pointer',color:'#aaa',padding:'2px',display:'flex'}} title="Logout"><LogOut size={14}/></button>
+                  </div>
+                </>
+              ) : (
+                <button onClick={() => goToScreen('login')} style={{background:'linear-gradient(135deg,#3CCFCF,#2AB8B8)',border:'none',padding:'8px 18px',borderRadius:'20px',color:'white',fontSize:'13px',fontWeight:'600',cursor:'pointer'}}>Login / Sign Up</button>
+              )}
+            </div>
+          </div>
+
+          <div className="logo-container" style={{marginTop:'70px'}}>
+            <div className="logo" style={{background:'none',boxShadow:'none',padding:0,animation:'none'}}>
+              <img
+                src={process.env.PUBLIC_URL + '/logo.png'}
+                alt="Craftly AI"
+                style={{width:'120px',height:'120px',borderRadius:'32px',objectFit:'cover',boxShadow:'0 20px 40px rgba(60,207,207,0.3)'}}
+                onError={(e) => { e.target.style.display='none'; e.target.parentNode.style.cssText='width:120px;height:120px;background:linear-gradient(135deg,#3CCFCF,#FF6F61);border-radius:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 20px 40px rgba(60,207,207,0.3)'; }}
+              />
             </div>
             <h1 className="app-name">Craftly AI</h1>
             <p className="app-tagline">Turn Waste into Wonder ✨</p>
@@ -1203,37 +1321,23 @@ export default function CraftlyAI() {
 
           <div className="feature-grid">
             <div className="feature-card">
-              <div className="feature-icon">
-                <Camera size={24} color="#3CCFCF" />
-              </div>
+              <div className="feature-icon"><Camera size={24} color="#3CCFCF" /></div>
               <div className="feature-title">Snap & Scan</div>
-              <div className="feature-desc">
-                Take photos of household items or recyclables
-              </div>
+              <div className="feature-desc">Take photos of household items or recyclables</div>
             </div>
-
             <div className="feature-card">
-              <div className="feature-icon">
-                <Sparkles size={24} color="#FF6F61" />
-              </div>
+              <div className="feature-icon"><Sparkles size={24} color="#FF6F61" /></div>
               <div className="feature-title">AI Magic</div>
-              <div className="feature-desc">
-                Get personalized craft ideas in seconds
-              </div>
+              <div className="feature-desc">Get personalized craft ideas in seconds</div>
             </div>
-
             <div className="feature-card">
-              <div className="feature-icon">
-                <Star size={24} color="#FFD84D" />
-              </div>
+              <div className="feature-icon"><Star size={24} color="#FFD84D" /></div>
               <div className="feature-title">Easy Steps</div>
-              <div className="feature-desc">
-                Follow simple, kid-friendly instructions
-              </div>
+              <div className="feature-desc">Follow simple, kid-friendly instructions</div>
             </div>
           </div>
 
-          <button className="primary-button" onClick={() => goToScreen('upload')}>
+          <button className="primary-button" onClick={() => currentUser ? goToScreen('upload') : goToScreen('login')}>
             <Sparkles size={20} />
             Start Creating
           </button>
@@ -1282,6 +1386,7 @@ export default function CraftlyAI() {
           goToScreen={goToScreen}
           toggleSaveCraft={toggleSaveCraft}
           savedCrafts={savedCrafts}
+          shareCraft={shareCraft}
           resetApp={resetApp}
         />
       )}
@@ -1325,6 +1430,116 @@ export default function CraftlyAI() {
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+// ============================================================================
+// AUTH COMPONENTS
+// ============================================================================
+
+function LoginScreen({ onLogin, onSwitchToSignup, onBack }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+    if (!email.trim() || !password) { setError('Please fill in all fields'); return; }
+    setLoading(true);
+    const result = onLogin(email.trim().toLowerCase(), password);
+    setLoading(false);
+    if (!result.success) setError(result.message);
+  };
+
+  return (
+    <div className="auth-screen fade-in">
+      <button className="auth-back" onClick={onBack}><ChevronRight size={20} style={{transform:'rotate(180deg)'}}/></button>
+      <div className="auth-logo"><Sparkles size={40} color="white" /></div>
+      <h1 style={{fontFamily:"'Fredoka',sans-serif",fontSize:'32px',fontWeight:700,background:'linear-gradient(135deg,#3CCFCF,#FF6F61)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Craftly AI</h1>
+      <p style={{fontSize:'14px',color:'#888',marginBottom:'4px'}}>Turn Waste into Wonder ✨</p>
+      <div className="auth-card">
+        <h2 className="auth-title">Welcome Back! 👋</h2>
+        <p className="auth-subtitle">Login to access your saved crafts</p>
+        {error && <div className="auth-error"><AlertCircle size={15}/>{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label className="auth-label">Email</label>
+            <input type="email" className="auth-input" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email"/>
+          </div>
+          <div className="auth-field">
+            <label className="auth-label">Password</label>
+            <div className="auth-input-wrap">
+              <input type={showPw ? 'text' : 'password'} className="auth-input" placeholder="Your password" value={password} onChange={e => setPassword(e.target.value)} style={{paddingRight:'42px'}} autoComplete="current-password"/>
+              <button type="button" className="auth-eye" onClick={() => setShowPw(!showPw)}>{showPw ? <EyeOff size={17}/> : <Eye size={17}/>}</button>
+            </div>
+          </div>
+          <button type="submit" className="auth-btn" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
+        </form>
+        <div className="auth-switch">Don't have an account? <span className="auth-link" onClick={onSwitchToSignup}>Sign up free</span></div>
+      </div>
+    </div>
+  );
+}
+
+function SignupScreen({ onSignup, onSwitchToLogin, onBack }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [showPw, setShowPw] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+    if (!name.trim() || !email.trim() || !password || !confirm) { setError('Please fill in all fields'); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
+    if (password !== confirm) { setError('Passwords do not match'); return; }
+    setLoading(true);
+    const result = onSignup(name.trim(), email.trim().toLowerCase(), password);
+    setLoading(false);
+    if (!result.success) setError(result.message);
+  };
+
+  return (
+    <div className="auth-screen fade-in">
+      <button className="auth-back" onClick={onBack}><ChevronRight size={20} style={{transform:'rotate(180deg)'}}/></button>
+      <div className="auth-logo"><Sparkles size={40} color="white" /></div>
+      <h1 style={{fontFamily:"'Fredoka',sans-serif",fontSize:'32px',fontWeight:700,background:'linear-gradient(135deg,#3CCFCF,#FF6F61)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Craftly AI</h1>
+      <p style={{fontSize:'14px',color:'#888',marginBottom:'4px'}}>Turn Waste into Wonder ✨</p>
+      <div className="auth-card">
+        <h2 className="auth-title">Create Account 🎨</h2>
+        <p className="auth-subtitle">Start your eco-crafting journey!</p>
+        {error && <div className="auth-error"><AlertCircle size={15}/>{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label className="auth-label">Full Name</label>
+            <input type="text" className="auth-input" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} autoComplete="name"/>
+          </div>
+          <div className="auth-field">
+            <label className="auth-label">Email</label>
+            <input type="email" className="auth-input" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email"/>
+          </div>
+          <div className="auth-field">
+            <label className="auth-label">Password</label>
+            <div className="auth-input-wrap">
+              <input type={showPw ? 'text' : 'password'} className="auth-input" placeholder="At least 6 characters" value={password} onChange={e => setPassword(e.target.value)} style={{paddingRight:'42px'}} autoComplete="new-password"/>
+              <button type="button" className="auth-eye" onClick={() => setShowPw(!showPw)}>{showPw ? <EyeOff size={17}/> : <Eye size={17}/>}</button>
+            </div>
+          </div>
+          <div className="auth-field">
+            <label className="auth-label">Confirm Password</label>
+            <input type={showPw ? 'text' : 'password'} className="auth-input" placeholder="Re-enter password" value={confirm} onChange={e => setConfirm(e.target.value)} autoComplete="new-password"/>
+          </div>
+          <button type="submit" className="auth-btn" disabled={loading}>{loading ? 'Creating...' : 'Create Account'}</button>
+        </form>
+        <div className="auth-switch">Already have an account? <span className="auth-link" onClick={onSwitchToLogin}>Login</span></div>
+      </div>
     </div>
   );
 }
@@ -1753,7 +1968,7 @@ function ProcessingScreen() {
   );
 }
 
-function ResultsScreen({ craftSuggestions, setSelectedCraft, goToScreen, toggleSaveCraft, savedCrafts, resetApp }) {
+function ResultsScreen({ craftSuggestions, setSelectedCraft, goToScreen, toggleSaveCraft, savedCrafts, resetApp, shareCraft }) {
   const handleCraftClick = (craft) => {
     setSelectedCraft(craft);
     goToScreen('detail');
@@ -1805,6 +2020,9 @@ function ResultsScreen({ craftSuggestions, setSelectedCraft, goToScreen, toggleS
                   onClick={(e) => { e.stopPropagation(); toggleSaveCraft(craft); }}
                 >
                   <Heart size={16} fill={savedCrafts.some(c => c.id === craft.id) ? 'white' : 'none'} />
+                </button>
+                <button className="secondary-button" onClick={(e) => { e.stopPropagation(); shareCraft(craft); }} title="Share">
+                  <Share2 size={16} />
                 </button>
               </div>
             </div>
