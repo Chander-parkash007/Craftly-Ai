@@ -1,9 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-<<<<<<< HEAD
-import { Camera, Upload, X, Plus, Trash2, Clock, Star, Sparkles, ChevronRight, Heart, Search, AlertCircle, CheckCircle } from 'lucide-react';
-=======
 import { Camera, Upload, X, Plus, Trash2, Clock, Star, Sparkles, ChevronRight, Heart, Search, AlertCircle, CheckCircle, LogOut, Eye, EyeOff, Share2 } from 'lucide-react';
->>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
 import { detectMaterials, generateCrafts } from './api';
 
 // ============================================================================
