@@ -1,8 +1,27 @@
 const GROQ_KEY = process.env.REACT_APP_GROQ_API_KEY;
+
+// Enhanced logging for debugging (especially on Vercel)
+console.log('=== Craftly AI - API Configuration ===');
+console.log('Environment:', process.env.NODE_ENV);
 console.log('Groq key loaded:', GROQ_KEY ? 'YES (' + GROQ_KEY.substring(0, 8) + '...)' : 'NO - KEY MISSING');
+console.log('Key length:', GROQ_KEY ? GROQ_KEY.length : 0);
+console.log('Key starts with gsk_:', GROQ_KEY ? GROQ_KEY.startsWith('gsk_') : false);
+
+// Check if API key is valid (not placeholder)
+const isValidKey = GROQ_KEY && 
+                   GROQ_KEY !== 'paste_your_groq_key_here' && 
+                   GROQ_KEY.length > 20 && 
+                   GROQ_KEY.startsWith('gsk_');
+
+console.log('API key is valid:', isValidKey);
+console.log('=====================================');
 
 // Groq for vision (image detection) - fast and free
 async function detectWithGroq(imageBase64, mediaType) {
+  if (!isValidKey) {
+    throw new Error('API key not configured. Please add your Groq API key to the .env file.');
+  }
+
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -10,32 +29,31 @@ async function detectWithGroq(imageBase64, mediaType) {
       'Authorization': `Bearer ${GROQ_KEY}`
     },
     body: JSON.stringify({
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      model: 'llama-3.2-90b-vision-preview',
       messages: [{
         role: 'user',
         content: [
           {
             type: 'image_url',
             image_url: { 
-              url: `data:${mediaType || 'image/jpeg'};base64,${imageBase64}`,
-              detail: 'low'
+              url: `data:${mediaType || 'image/jpeg'};base64,${imageBase64}`
             }
           },
           {
             type: 'text',
-            text: `List all craft materials visible in this image as JSON only: [{"name":"item","emoji":"emoji"}]`
+            text: `Analyze this image and list all craft materials, recyclables, or household items that could be used for DIY crafts. Return ONLY a JSON array in this exact format: [{"name":"item name","emoji":"appropriate emoji"}]. Be specific and practical.`
           }
         ]
       }],
       max_tokens: 500,
-      temperature: 0.1
+      temperature: 0.3
     })
   });
 
   if (!res.ok) {
     const errData = await res.json();
     console.error('Groq API error response:', errData);
-    throw new Error(errData.error?.message || 'Groq error');
+    throw new Error(errData.error?.message || 'Groq vision API error');
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content || '';
@@ -43,6 +61,10 @@ async function detectWithGroq(imageBase64, mediaType) {
 
 // Groq for text generation (craft ideas)
 async function generateWithGroq(prompt) {
+  if (!isValidKey) {
+    throw new Error('API key not configured. Please add your Groq API key to the .env file.');
+  }
+
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -50,19 +72,20 @@ async function generateWithGroq(prompt) {
       'Authorization': `Bearer ${GROQ_KEY}`
     },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
+      model: 'llama-3.3-70b-versatile',
       messages: [
-        { role: 'system', content: 'You are a creative DIY craft expert. Always respond with valid JSON only. No markdown, no explanation.' },
+        { role: 'system', content: 'You are a creative DIY craft expert. Always respond with valid JSON only. No markdown, no explanation, no code blocks - just pure JSON array.' },
         { role: 'user', content: prompt }
       ],
-      max_tokens: 2500,
-      temperature: 1.0
+      max_tokens: 3000,
+      temperature: 0.9
     })
   });
 
   if (!res.ok) {
     const errData = await res.json();
-    throw new Error(errData.error?.message || 'Groq error');
+    console.error('Groq API error response:', errData);
+    throw new Error(errData.error?.message || 'Groq generation API error');
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content || '';
@@ -71,17 +94,27 @@ async function generateWithGroq(prompt) {
 export async function detectMaterials(imageBase64, mediaType) {
   try {
     const text = await detectWithGroq(imageBase64, mediaType);
+    console.log('Groq vision response:', text);
     const materials = tryParseJSON(text) || extractMaterialsFromText(text);
-    if (materials && materials.length > 0) return materials;
+    if (materials && materials.length > 0) {
+      console.log('Detected materials:', materials);
+      return materials;
+    }
   } catch (err) {
     console.error('Groq vision error:', err);
+    // If API key is missing, throw error to show user
+    if (err.message.includes('API key not configured')) {
+      throw err;
+    }
   }
 
+  // Fallback materials
+  console.log('Using fallback materials');
   return [
-    { name: 'cardboard', emoji: '📦' },
+    { name: 'cardboard box', emoji: '📦' },
     { name: 'plastic bottle', emoji: '🍾' },
     { name: 'paper', emoji: '📄' },
-    { name: 'scissors', emoji: '✂️' }
+    { name: 'fabric scraps', emoji: '🧵' }
   ];
 }
 
@@ -94,32 +127,62 @@ export async function generateCrafts(materials, preferences) {
   const craftTypes = [
     'home decoration', 'functional storage organizer', 'kids toy or game',
     'garden or outdoor item', 'wearable accessory', 'wall art',
-    'gift item', 'desk organizer', 'plant holder', 'lamp or lighting'
+    'gift item', 'desk organizer', 'plant holder', 'lamp or lighting',
+    'jewelry', 'picture frame', 'bookmark', 'coaster set'
   ];
   const shuffled = craftTypes.sort(() => Math.random() - 0.5).slice(0, 4);
 
-  const prompt = `Generate exactly 4 COMPLETELY DIFFERENT DIY craft ideas.
+  const prompt = `Create exactly 4 UNIQUE and CREATIVE DIY craft projects using these materials.
 
-MATERIALS: ${materialsText}
-SKILL: ${preferences.skillLevel}
-TIME: ${preferences.timeAvailable} minutes
+AVAILABLE MATERIALS: ${materialsText}
+SKILL LEVEL: ${preferences.skillLevel}
+TIME AVAILABLE: ${preferences.timeAvailable} minutes
 PURPOSE: ${preferences.purpose}
-TOOLS: ${toolsText}
-SEED: ${randomSeed}
+TOOLS AVAILABLE: ${toolsText}
+RANDOM SEED: ${randomSeed}
 
-REQUIRED TYPES: ${shuffled.join(', ')}
+REQUIRED CRAFT TYPES (one of each): ${shuffled.join(', ')}
 
-Return ONLY this JSON array:
-[{"id":"craft-${timestamp}-1","name":"Creative Name","emoji":"🎨","difficulty":"Easy ⭐","time":"20 mins","materials":["material1"],"steps":[{"title":"Step","description":"Action"}],"tips":["tip"]}]`;
+IMPORTANT RULES:
+- Each craft must be completely different from the others
+- Use creative, appealing names (not generic)
+- Steps should be clear and actionable
+- Include 2-3 helpful tips for each craft
+- Make crafts appropriate for the skill level and time
+
+Return ONLY a JSON array (no markdown, no code blocks):
+[
+  {
+    "id": "craft-${timestamp}-1",
+    "name": "Creative Craft Name",
+    "emoji": "🎨",
+    "difficulty": "Easy ⭐",
+    "time": "20 mins",
+    "materials": ["material1", "material2"],
+    "steps": [
+      {"title": "Step Title", "description": "Clear action to take"}
+    ],
+    "tips": ["Helpful tip 1", "Helpful tip 2"]
+  }
+]`;
 
   try {
     const text = await generateWithGroq(prompt);
+    console.log('Groq generation response:', text);
     const crafts = tryParseJSON(text);
-    if (crafts && crafts.length > 0) return crafts;
+    if (crafts && Array.isArray(crafts) && crafts.length > 0) {
+      console.log('Generated crafts:', crafts);
+      return crafts;
+    }
   } catch (err) {
     console.error('Generation error:', err);
+    // If API key is missing, throw error to show user
+    if (err.message.includes('API key not configured')) {
+      throw err;
+    }
   }
 
+  console.log('Using fallback crafts');
   return [];
 }
 

@@ -1309,10 +1309,15 @@ export default function CraftlyAI() {
           <div className="logo-container" style={{marginTop:'70px'}}>
             <div className="logo" style={{background:'none',boxShadow:'none',padding:0,animation:'none'}}>
               <img
-                src={process.env.PUBLIC_URL + '/logo.png'}
+                src="/logo.png"
                 alt="Craftly AI"
                 style={{width:'120px',height:'120px',borderRadius:'32px',objectFit:'cover',boxShadow:'0 20px 40px rgba(60,207,207,0.3)'}}
-                onError={(e) => { e.target.style.display='none'; e.target.parentNode.style.cssText='width:120px;height:120px;background:linear-gradient(135deg,#3CCFCF,#FF6F61);border-radius:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 20px 40px rgba(60,207,207,0.3)'; }}
+                onError={(e) => { 
+                  e.target.style.display='none'; 
+                  const parent = e.target.parentNode;
+                  parent.style.cssText='width:120px;height:120px;background:linear-gradient(135deg,#3CCFCF,#FF6F61);border-radius:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 20px 40px rgba(60,207,207,0.3)';
+                  parent.innerHTML = '<span style="font-size:48px">🎨</span>';
+                }}
               />
             </div>
             <h1 className="app-name">Craftly AI</h1>
@@ -1612,7 +1617,19 @@ function UploadScreen({ images, setImages, goToScreen, setDetectedMaterials, set
       goToScreen('review');
     } catch (err) {
       console.error('Detection error:', err);
-      setError('AI error: ' + err.message);
+      if (err.message.includes('API key not configured')) {
+        setError('⚠️ API Key Not Configured! Get a free key from console.groq.com and add it to the .env file. Using fallback materials for now.');
+        // Still proceed with fallback materials
+        setDetectedMaterials([
+          { name: 'cardboard box', emoji: '📦' },
+          { name: 'plastic bottle', emoji: '🍾' },
+          { name: 'paper', emoji: '📄' },
+          { name: 'fabric scraps', emoji: '🧵' }
+        ]);
+        setTimeout(() => goToScreen('review'), 2000);
+      } else {
+        setError('AI error: ' + err.message);
+      }
     }
   };
 
@@ -1832,6 +1849,9 @@ function PreferencesScreen({ preferences, setPreferences, confirmedMaterials, go
       setTimeout(() => { setIsProcessing(false); goToScreen('results'); }, 1500);
     } catch (err) {
       console.error('Generation error:', err);
+      if (err.message.includes('API key not configured')) {
+        setError('⚠️ API Key Not Configured! Get a free key from console.groq.com and add it to the .env file. Showing sample crafts for now.');
+      }
       setCraftSuggestions(generateFallbackCrafts(confirmedMaterials, preferences));
       setTimeout(() => { setIsProcessing(false); goToScreen('results'); }, 1500);
     }

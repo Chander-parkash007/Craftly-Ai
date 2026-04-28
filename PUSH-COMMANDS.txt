@@ -1,0 +1,46 @@
+═══════════════════════════════════════════════════════════
+  CRAFTLY AI - GITHUB PUSH COMMANDS
+═══════════════════════════════════════════════════════════
+
+STEP 1: Create repository on GitHub first!
+→ Go to: https://github.com/new
+→ Name: craftly-ai
+→ Public repository
+→ DO NOT initialize with README
+→ Click "Create repository"
+
+═══════════════════════════════════════════════════════════
+
+STEP 2: Run these commands in your terminal:
+
+# Add all files
+git add .
+
+# Commit
+git commit -m "Initial commit: Craftly AI - AI-powered upcycling app"
+
+# Add remote (REPLACE YOUR_USERNAME!)
+git remote add origin https://github.com/YOUR_USERNAME/craftly-ai.git
+
+# Push to GitHub
+git branch -M main
+git push -u origin main
+
+═══════════════════════════════════════════════════════════
+
+EXAMPLE (replace with your username):
+
+git remote add origin https://github.com/chanderparkash/craftly-ai.git
+
+═══════════════════════════════════════════════════════════
+
+YOUR GITHUB URL WILL BE:
+https://github.com/YOUR_USERNAME/craftly-ai
+
+Use this URL in Devpost submission!
+
+═══════════════════════════════════════════════════════════
+
+NEED HELP? Read: PUSH-TO-GITHUB.md
+
+═══════════════════════════════════════════════════════════

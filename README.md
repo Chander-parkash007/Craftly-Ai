@@ -1,204 +1,225 @@
 # 🎨 Craftly AI - Turn Waste into Wonder
 
-An AI-powered mobile app that helps you create amazing DIY crafts from household waste and recyclable materials.
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://craftly-ai-swqv-nrgqskao-chander-parkash007s-projects.vercel.app)
+[![GitHub](https://img.shields.io/badge/github-repo-blue)](https://github.com/Chander-parkash007/Craftly-Ai)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-![Craftly AI](https://img.shields.io/badge/React-18.2.0-blue) ![License](https://img.shields.io/badge/License-MIT-green)
+An AI-powered web application that transforms household waste into creative DIY craft projects. Simply upload photos of recyclable materials, and our AI generates personalized, step-by-step craft ideas in seconds!
+
+![Craftly AI Banner](public/logo.png)
 
 ## ✨ Features
 
-- 📸 **Image Upload**: Take photos or upload images of materials
-- 🤖 **AI Detection**: Automatically identifies craft materials
-- ✏️ **Manual Editing**: Add or remove detected materials
-- 🎯 **Personalization**: Choose skill level, time, and purpose
-- 💡 **Smart Suggestions**: Get 3-5 unique craft ideas
-- 📝 **Step-by-Step**: Easy-to-follow instructions
-- ❤️ **Save Favorites**: Bookmark your favorite crafts
-- 🌱 **Eco-Friendly**: Promotes recycling and sustainability
+- 📸 **Image Recognition**: Upload photos of household items (bottles, cardboard, paper, fabric, etc.)
+- 🤖 **AI Detection**: Computer vision identifies recyclable materials and their craft potential
+- 🎨 **Smart Generation**: AI generates 4 unique, personalized DIY craft ideas based on:
+  - Available materials
+  - User's skill level (beginner/intermediate)
+  - Time available (5-30 minutes)
+  - Purpose (home decor, gifts, school projects, kids crafts)
+  - Available tools (scissors, glue, paint, tape)
+- 📝 **Step-by-Step Guides**: Each craft comes with detailed instructions, material lists, and pro tips
+- ❤️ **Save & Organize**: Users can save favorite projects and access them anytime
+- 👤 **User Accounts**: Secure authentication with persistent sessions
+- 📱 **Mobile-First**: Fully responsive design that works on all devices
 
-## 🚀 Quick Start (Windows)
+## 🚀 Live Demo
+
+Try it out: [Craftly AI on Vercel](https://craftly-ai-swqv-nrgqskao-chander-parkash007s-projects.vercel.app)
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **React 18** - Modern UI with hooks and functional components
+- **Lucide React** - Beautiful, consistent iconography
+- **CSS-in-JS** - Responsive design with gradient aesthetics
+- **LocalStorage API** - Client-side data persistence
+
+### AI/ML
+- **Groq API** - Ultra-fast AI inference (< 1 second responses)
+- **Llama 3.2 90B Vision** - Image analysis and material detection
+- **Llama 3.3 70B Versatile** - Creative craft idea generation
+- **Custom Prompts** - Engineered for diverse, practical suggestions
+
+### Deployment
+- **Vercel** - Serverless deployment with automatic CI/CD
+- **Git** - Version control and collaboration
+
+## 📦 Installation
 
 ### Prerequisites
+- Node.js 16+ and npm
+- Groq API key (get free at [console.groq.com](https://console.groq.com))
 
-Make sure you have **Node.js** installed:
-1. Download from https://nodejs.org (LTS version)
-2. Run the installer
-3. Restart your computer
+### Setup
 
-### Installation
-
-1. **Extract the folder** to your Desktop
-2. **Open Command Prompt** (Windows + R, type `cmd`, press Enter)
-3. **Navigate to the folder**:
-   ```bash
-   cd Desktop\craftly-ai-complete
-   ```
-4. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-   (Wait 2-5 minutes for installation to complete)
-
-5. **Start the app**:
-   ```bash
-   npm start
-   ```
-
-6. **Open your browser** to http://localhost:3000
-
-That's it! 🎉
-
-## 📁 Project Structure
-
-```
-craftly-ai-complete/
-├── public/
-│   └── index.html          # HTML template
-├── src/
-│   ├── App.jsx             # Main application component
-│   ├── index.js            # Entry point
-│   └── index.css           # Global styles
-├── package.json            # Dependencies and scripts
-├── .gitignore             # Git ignore file
-└── README.md              # This file
+1. **Clone the repository**
+```bash
+git clone https://github.com/Chander-parkash007/Craftly-Ai.git
+cd Craftly-Ai
 ```
 
-## 🔧 Available Scripts
+2. **Install dependencies**
+```bash
+npm install
+```
 
-In the project directory, you can run:
+3. **Configure environment variables**
 
-### `npm start`
-Runs the app in development mode.
-Open http://localhost:3000 to view it in your browser.
+Create a `.env` file in the root directory:
+```env
+REACT_APP_GROQ_API_KEY=your_groq_api_key_here
+```
 
-### `npm run build`
-Builds the app for production to the `build` folder.
+Get your free Groq API key:
+- Visit https://console.groq.com
+- Sign up (no credit card required)
+- Create an API key
+- Copy and paste it in the `.env` file
 
-## 🌐 Deployment
+4. **Start the development server**
+```bash
+npm start
+```
 
-### Deploy to Vercel (Free)
-
-1. Install Vercel CLI:
-   ```bash
-   npm install -g vercel
-   ```
-
-2. Deploy:
-   ```bash
-   npm run build
-   vercel
-   ```
-
-3. Follow the prompts and get your live URL!
-
-### Deploy to Netlify (Free)
-
-1. Build the project:
-   ```bash
-   npm run build
-   ```
-
-2. Drag and drop the `build` folder to https://app.netlify.com/drop
-
-## 🔑 API Configuration
-
-This app uses **Anthropic Claude API** for AI features. The API key is already included for testing, but for production:
-
-1. Get your own API key from https://console.anthropic.com
-2. Replace the API key in `src/App.jsx` (search for `x-api-key`)
-
-### Free Alternatives
-
-- **Google Gemini**: https://ai.google.dev (Free tier)
-- **Hugging Face**: https://huggingface.co/inference-api (Free tier)
-- **OpenAI**: https://platform.openai.com ($5 free credit)
+5. **Open your browser**
+```
+http://localhost:3000
+```
 
 ## 🎯 How to Use
 
-1. **Start Creating**: Click "Start Creating" on the welcome screen
-2. **Upload Images**: Take photos or upload images of materials (max 5)
-3. **Detect Materials**: AI will identify recyclable materials
-4. **Review & Edit**: Confirm or modify detected materials
-5. **Set Preferences**: Choose skill level, time, purpose, and tools
-6. **Generate Ideas**: Get AI-powered craft suggestions
+1. **Sign Up / Login**: Create an account or login to save your crafts
+2. **Upload Images**: Take photos or upload images of household items (max 5)
+3. **Detect Materials**: AI identifies recyclable materials in your images
+4. **Review & Edit**: Confirm or modify detected materials, add more if needed
+5. **Set Preferences**: Choose skill level, time available, purpose, and tools
+6. **Generate Ideas**: Get 4 unique, personalized craft suggestions
 7. **View Details**: See step-by-step instructions for each craft
 8. **Save Favorites**: Bookmark crafts you want to try later
 
-## 🎨 Customization
+## 🏗️ Project Structure
 
-### Change Colors
+```
+craftly-ai/
+├── public/
+│   ├── index.html
+│   └── logo.png
+├── src/
+│   ├── App.jsx           # Main application component
+│   ├── api.js            # Groq API integration
+│   ├── DiagnosticPage.jsx # Debug tool
+│   ├── index.js          # Entry point
+│   └── index.css         # Global styles
+├── .env                  # Environment variables (not in repo)
+├── .gitignore
+├── package.json
+├── vercel.json           # Vercel configuration
+└── README.md
+```
 
-Edit the CSS variables in `src/App.jsx` to change the color scheme:
-- Primary: `#3CCFCF` (Teal)
-- Secondary: `#FF6F61` (Coral)
-- Accent: `#FFD84D` (Yellow)
+## 🌟 Key Features Explained
 
-### Add More Preferences
+### AI-Powered Material Detection
+- Uses Llama 3.2 90B Vision model
+- Analyzes images to identify recyclable materials
+- Provides emoji icons for visual recognition
+- Fallback detection for common materials
 
-Modify the `preferences` state in `src/App.jsx` to add more options like:
-- Difficulty levels
-- Age groups
-- Craft categories
+### Creative Craft Generation
+- Uses Llama 3.3 70B Versatile model
+- Generates unique ideas based on user preferences
+- Randomization ensures variety
+- Detailed step-by-step instructions
+- Pro tips for better results
 
-## 🐛 Troubleshooting
+### User Authentication
+- Secure signup and login
+- Session persistence across page refreshes
+- Per-user saved crafts
+- Logout functionality
 
-### "npm is not recognized"
-- Node.js is not installed or not in PATH
-- Solution: Reinstall Node.js and restart your computer
+### Save & Organize
+- Save favorite crafts with one click
+- View all saved crafts in dedicated tab
+- Persistent storage using localStorage
+- Timestamp tracking
 
-### Port 3000 already in use
-- Another app is using port 3000
-- Solution: Close other apps or run on different port:
-  ```bash
-  set PORT=3001 && npm start
-  ```
+## 🚀 Deployment
 
-### Module not found errors
-- Dependencies not installed properly
-- Solution: Delete `node_modules` and run `npm install` again
+### Deploy to Vercel
 
-### API errors
-- Check your internet connection
-- Verify API key is valid
-- Check API credits/quota
+1. **Install Vercel CLI**
+```bash
+npm i -g vercel
+```
 
-## 📱 Mobile Responsive
+2. **Login to Vercel**
+```bash
+vercel login
+```
 
-The app is fully responsive and works great on:
-- 📱 Mobile phones (iOS & Android)
-- 📱 Tablets
-- 💻 Desktop browsers
+3. **Deploy**
+```bash
+vercel --prod
+```
+
+4. **Set Environment Variables**
+- Go to Vercel Dashboard → Your Project → Settings
+- Add `REACT_APP_GROQ_API_KEY` with your API key
+- Check all environments (Production, Preview, Development)
+- Redeploy
+
+### Environment Variables on Vercel
+
+Make sure to set:
+- **Key**: `REACT_APP_GROQ_API_KEY`
+- **Value**: Your Groq API key (starts with `gsk_`)
+- **Environments**: Production ✅ Preview ✅ Development ✅
+
+## 🧪 Testing
+
+Visit `/test-features.html` for an interactive test suite that checks:
+- localStorage functionality
+- User authentication
+- Save/unsave features
+- API integration
+- Logo loading
 
 ## 🤝 Contributing
 
-This is a hackathon project! Feel free to:
-- Fork the repository
-- Create new features
-- Fix bugs
-- Improve documentation
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-This project is open source and available under the MIT License.
+## 📝 License
 
-## 👨‍💻 Author
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Created for hackathon submission.
+## 👥 Team
+
+- **Backend & AI Integration** - API integration, AI models, data management
+- **Frontend Development** - React architecture, state management, components
+- **UI/UX Design** - Design system, styling, animations, testing
+- **Documentation** - README, guides, testing, Devpost submission
 
 ## 🙏 Acknowledgments
 
-- Anthropic Claude API for AI capabilities
-- Lucide React for beautiful icons
-- React team for the amazing framework
+- [Groq](https://groq.com) for fast AI inference
+- [Meta](https://ai.meta.com) for Llama models
+- [Lucide](https://lucide.dev) for beautiful icons
+- [Vercel](https://vercel.com) for seamless deployment
 
-## 📧 Support
+## 📧 Contact
 
-If you have any questions or issues:
-1. Check the Troubleshooting section
-2. Review the code comments
-3. Test with different materials and images
+For questions or feedback, please open an issue on GitHub.
 
 ---
 
-**Happy Crafting! ♻️✨**
+**Built with ❤️ for a sustainable future** 🌱
 
-Made with ❤️ for the environment and creativity
+*Making upcycling accessible and fun, one craft at a time!*
