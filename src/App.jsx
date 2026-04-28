@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+<<<<<<< HEAD
+import { Camera, Upload, X, Plus, Trash2, Clock, Star, Sparkles, ChevronRight, Heart, Search, AlertCircle, CheckCircle } from 'lucide-react';
+=======
 import { Camera, Upload, X, Plus, Trash2, Clock, Star, Sparkles, ChevronRight, Heart, Search, AlertCircle, CheckCircle, LogOut, Eye, EyeOff, Share2 } from 'lucide-react';
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
 import { detectMaterials, generateCrafts } from './api';
 
 // ============================================================================
@@ -8,7 +12,10 @@ import { detectMaterials, generateCrafts } from './api';
 
 export default function CraftlyAI() {
   const [screen, setScreen] = useState('welcome');
+<<<<<<< HEAD
+=======
   const [currentUser, setCurrentUser] = useState(null);
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
   const [images, setImages] = useState([]);
   const [detectedMaterials, setDetectedMaterials] = useState([]);
   const [confirmedMaterials, setConfirmedMaterials] = useState([]);
@@ -41,6 +48,16 @@ export default function CraftlyAI() {
     goToScreen('welcome');
   };
 
+<<<<<<< HEAD
+  // Toggle saved craft
+  const toggleSaveCraft = (craft) => {
+    const isSaved = savedCrafts.some(c => c.id === craft.id);
+    if (isSaved) {
+      setSavedCrafts(savedCrafts.filter(c => c.id !== craft.id));
+    } else {
+      setSavedCrafts([...savedCrafts, craft]);
+    }
+=======
   // Toggle saved craft - always reads fresh from localStorage
   const toggleSaveCraft = (craft) => {
     if (!currentUser) { goToScreen('login'); return; }
@@ -111,6 +128,7 @@ export default function CraftlyAI() {
     const text = craft.name + ' ' + craft.emoji + ' - Made with Craftly AI!';
     if (navigator.share) { try { await navigator.share({ title: craft.name, text }); } catch (e) {} }
     else { try { await navigator.clipboard.writeText(text); alert('Copied!'); } catch (e) {} }
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
   };
 
   return (
@@ -1249,6 +1267,10 @@ export default function CraftlyAI() {
             grid-template-columns: 1fr;
           }
         }
+<<<<<<< HEAD
+      `}</style>
+
+=======
 
         /* ── AUTH STYLES ─────────────────────────────────── */
         .auth-screen { min-height:100vh; background:linear-gradient(180deg,#FFE8DC 0%,#FFFFFF 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 24px; position:relative; }
@@ -1279,10 +1301,17 @@ export default function CraftlyAI() {
         <SignupScreen onSignup={handleSignup} onSwitchToLogin={() => setScreen('login')} onBack={() => setScreen('welcome')} />
       )}
 
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
       {screen === 'welcome' && (
         <div className="welcome-screen fade-in">
           <div className="welcome-bg-blob"></div>
           <div className="welcome-bg-blob"></div>
+<<<<<<< HEAD
+          
+          <div className="logo-container">
+            <div className="logo" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
+              <img src={process.env.PUBLIC_URL + '/logo.png'} alt="Craftly AI" style={{ width: '120px', height: '120px', borderRadius: '32px', objectFit: 'contain', boxShadow: '0 20px 40px rgba(60,207,207,0.3)' }} />
+=======
 
           {/* TOP HEADER */}
           <div style={{position:'absolute',top:0,left:0,right:0,padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',zIndex:10,background:'rgba(255,255,255,0.92)',backdropFilter:'blur(8px)',borderBottom:'1px solid rgba(0,0,0,0.06)'}}>
@@ -1319,6 +1348,7 @@ export default function CraftlyAI() {
                   parent.innerHTML = '<span style="font-size:48px">🎨</span>';
                 }}
               />
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
             </div>
             <h1 className="app-name">Craftly AI</h1>
             <p className="app-tagline">Turn Waste into Wonder ✨</p>
@@ -1326,6 +1356,39 @@ export default function CraftlyAI() {
 
           <div className="feature-grid">
             <div className="feature-card">
+<<<<<<< HEAD
+              <div className="feature-icon">
+                <Camera size={24} color="#3CCFCF" />
+              </div>
+              <div className="feature-title">Snap & Scan</div>
+              <div className="feature-desc">
+                Take photos of household items or recyclables
+              </div>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Sparkles size={24} color="#FF6F61" />
+              </div>
+              <div className="feature-title">AI Magic</div>
+              <div className="feature-desc">
+                Get personalized craft ideas in seconds
+              </div>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Star size={24} color="#FFD84D" />
+              </div>
+              <div className="feature-title">Easy Steps</div>
+              <div className="feature-desc">
+                Follow simple, kid-friendly instructions
+              </div>
+            </div>
+          </div>
+
+          <button className="primary-button" onClick={() => goToScreen('upload')}>
+=======
               <div className="feature-icon"><Camera size={24} color="#3CCFCF" /></div>
               <div className="feature-title">Snap & Scan</div>
               <div className="feature-desc">Take photos of household items or recyclables</div>
@@ -1343,6 +1406,7 @@ export default function CraftlyAI() {
           </div>
 
           <button className="primary-button" onClick={() => currentUser ? goToScreen('upload') : goToScreen('login')}>
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
             <Sparkles size={20} />
             Start Creating
           </button>
@@ -1391,7 +1455,10 @@ export default function CraftlyAI() {
           goToScreen={goToScreen}
           toggleSaveCraft={toggleSaveCraft}
           savedCrafts={savedCrafts}
+<<<<<<< HEAD
+=======
           shareCraft={shareCraft}
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
           resetApp={resetApp}
         />
       )}
@@ -1440,6 +1507,8 @@ export default function CraftlyAI() {
 }
 
 // ============================================================================
+<<<<<<< HEAD
+=======
 // AUTH COMPONENTS
 // ============================================================================
 
@@ -1550,6 +1619,7 @@ function SignupScreen({ onSignup, onSwitchToLogin, onBack }) {
 }
 
 // ============================================================================
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
 // CHILD COMPONENTS
 // ============================================================================
 
@@ -1988,7 +2058,11 @@ function ProcessingScreen() {
   );
 }
 
+<<<<<<< HEAD
+function ResultsScreen({ craftSuggestions, setSelectedCraft, goToScreen, toggleSaveCraft, savedCrafts, resetApp }) {
+=======
 function ResultsScreen({ craftSuggestions, setSelectedCraft, goToScreen, toggleSaveCraft, savedCrafts, resetApp, shareCraft }) {
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
   const handleCraftClick = (craft) => {
     setSelectedCraft(craft);
     goToScreen('detail');
@@ -2041,9 +2115,12 @@ function ResultsScreen({ craftSuggestions, setSelectedCraft, goToScreen, toggleS
                 >
                   <Heart size={16} fill={savedCrafts.some(c => c.id === craft.id) ? 'white' : 'none'} />
                 </button>
+<<<<<<< HEAD
+=======
                 <button className="secondary-button" onClick={(e) => { e.stopPropagation(); shareCraft(craft); }} title="Share">
                   <Share2 size={16} />
                 </button>
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
               </div>
             </div>
           </div>

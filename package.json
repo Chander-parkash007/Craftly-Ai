@@ -6,16 +6,28 @@
     "node": "18.x"
   },
   "dependencies": {
+<<<<<<< HEAD
+    "lucide-react": "^0.263.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1"
+=======
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "lucide-react": "^0.263.1"
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+<<<<<<< HEAD
+    "eject": "react-scripts eject",
+    "server": "node server/index.js"
+=======
     "eject": "react-scripts eject"
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
   },
   "eslintConfig": {
     "extends": [
@@ -33,5 +45,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+<<<<<<< HEAD
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+=======
+>>>>>>> 830d155a8a2a22f8db8ffe4ab542240e58c3cff5
   }
 }
